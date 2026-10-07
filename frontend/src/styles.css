@@ -1,0 +1,102 @@
+:root {
+  --ink: #16222e;
+  --muted: #5b6b7a;
+  --panel: #0f3d3e;
+  --panel-text: #e3f2ef;
+  --bg: #eef3f4;
+  --card: #ffffff;
+  --line: #cfdadd;
+  --accent: #0f766e;
+  --accent-dark: #0b5a54;
+  --danger: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+
+/* Tubes background */
+.tubes-bg { position: relative; min-height: 100vh; overflow: hidden; background: var(--panel); }
+.tubes-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.tubes-content { position: relative; z-index: 1; pointer-events: none; } /* mouse passes through to the canvas */
+
+.shell { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+.side { background: transparent; color: var(--panel-text); padding: 12vh 8%; display: flex; flex-direction: column; justify-content: center; text-shadow: 0 0 18px rgba(0, 0, 0, .6); }
+.side h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; margin: 0 0 1rem; line-height: 1.1; }
+.side p { max-width: 36ch; line-height: 1.6; opacity: .85; }
+
+.card { pointer-events: auto; align-self: center; justify-self: center; width: min(420px, 90%); padding: 2.2rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+h1 { font-size: 1.6rem; margin: 0 0 1.4rem; }
+
+.field { display: block; margin-bottom: 1rem; }
+.field span { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .35rem; }
+.field input { width: 100%; padding: .75rem .85rem; font: inherit; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.field input::placeholder { color: #8795a1; opacity: 1; }
+.field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+
+/* Show/hide password: the eye button sits inside the input's right edge */
+.input-wrap { position: relative; }
+.input-wrap input.has-eye { padding-right: 2.8rem; }
+.eye { position: absolute; top: 50%; right: .35rem; transform: translateY(-50%); display: grid; place-items: center; width: 2.2rem; height: 2.2rem; padding: 0; background: none; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; }
+.eye:hover { color: var(--ink); }
+.eye:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Confirm-password feedback: green glow when matched, red shake when not */
+.input-wrap.match-ok input { border-color: var(--accent); animation: glow .7s ease-out; }
+.input-wrap.match-no input { border-color: var(--danger); }
+.input-wrap.match-no input:focus { outline-color: var(--danger); }
+.input-wrap.shake { animation: shake .4s ease-in-out; }
+
+.match-slot { min-height: 1.5rem; margin: -.4rem 0 1rem; }   /* reserved height: the form doesn't jump */
+.match { display: flex; align-items: center; gap: .4rem; margin: 0; font-size: .85rem; font-weight: 600; }
+.match.ok { color: var(--accent-dark); }
+.match.no { color: var(--danger); }
+.match svg { width: 20px; height: 20px; flex: none; }
+.match .ring { fill: none; stroke: currentColor; stroke-width: 2; }
+.match .mark { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .35s .1s ease-out forwards; }   /* tick/cross draws itself */
+.match.ok svg { animation: pop .45s cubic-bezier(.34, 1.56, .64, 1); }
+.match span { animation: slide-in .25s ease-out; }
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes slide-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes glow { from { box-shadow: 0 0 0 0 rgba(15, 118, 110, .45); } to { box-shadow: 0 0 0 9px rgba(15, 118, 110, 0); } }
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+/* People who turn off motion in their system settings still get the colours and text, minus the movement */
+@media (prefers-reduced-motion: reduce) {
+  .input-wrap, .input-wrap input, .match svg, .match span { animation: none !important; }
+  .match .mark { animation: none; stroke-dashoffset: 0; }
+}
+
+/* Live password checklist: red cross until the rule passes, then green tick */
+.rules { list-style: none; margin: -.4rem 0 1rem; padding: 0; font-size: .8rem; color: var(--muted); }
+.rules li { padding-left: 1.3rem; position: relative; line-height: 1.7; }
+.rules li::before { content: "\2715"; position: absolute; left: 0; color: var(--danger); }
+.rules li.ok { color: var(--accent-dark); }
+.rules li.ok::before { content: "\2713"; color: var(--accent); }
+
+.btn { width: 100%; padding: .8rem; font: inherit; font-weight: 700; color: #fff; background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+.btn:hover:not(:disabled) { background: var(--accent-dark); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn:focus-visible, .link:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.link { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.link:disabled { color: var(--muted); cursor: default; text-decoration: none; }
+form .link { display: block; margin: 1rem auto 0; }
+.switch { text-align: center; margin: 1.6rem 0 0; color: var(--muted); font-size: .9rem; }
+.hint { color: var(--muted); line-height: 1.5; margin-top: 0; }
+
+.alert { padding: .65rem .8rem; border-radius: 8px; font-size: .88rem; margin: 0 0 1rem; }
+.alert.error { background: #fdecea; color: var(--danger); }
+.alert.info { background: #e4f4f1; color: var(--accent-dark); }
+
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { padding: 2rem 1.5rem; }
+  .side h2 { font-size: 1.6rem; }
+  .card { margin: 1.5rem 0; }
+}
